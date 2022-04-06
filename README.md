@@ -1,4 +1,4 @@
-# SFuzzer integration with FuzzBench
+# SFuzzer Integration with FuzzBench
 This repository is a fork from the official FuzzBench repository with the integration of a new fuzzer: `sfuzzer`.
 We have tested sfuzzer on the four stateful  benchmarks: `curl_curl_fuzzer`, `gstreamer_gst-discoverer`, `h2o_h2o-fuzzer-http2`, `mbedtls_fuzz_dtlsserver`
 
