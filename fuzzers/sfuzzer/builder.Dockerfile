@@ -15,11 +15,12 @@
 ARG parent_image
 FROM $parent_image
 
-RUN git clone https://github.com/bajinsheng/SFuzzer.git && \
+RUN git clone https://github.com/bajinsheng/SFuzzer.git /SFuzzer && \
     cd /SFuzzer && \
     (for f in *.cpp; do \
       clang++ -stdlib=libc++ -fPIC -O2 -std=c++11 $f -c & \
     done && wait) && \
-    ar r /usr/lib/libsFuzzer.a *.o 
+    ar r /usr/lib/libsFuzzer.a *.o && \
+    cp sanitizer/State_machine_instrument.py /opt/
 
 

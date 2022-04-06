@@ -28,7 +28,6 @@ RUN sed -i '/^#\sdeb-src /s/^#//' "/etc/apt/sources.list" && \
 
 COPY glib-2.64.2.tar.xz $SRC/
 
-COPY state_variable.patch $SRC/
 # Checkout all development repositories
 #RUN for i in orc  gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav; do git clone --depth 1 --recursive https://anongit.freedesktop.org/git/gstreamer/$i $i; done
 RUN \

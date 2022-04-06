@@ -19,7 +19,7 @@
 #patch -p0 -i state_variable.patch
 #popd
 
-python3 $SRC/fuzzers/sfuzzer/SFuzzer/sanitizer/State_machine_instrument.py . -b /blocked_variables.txt
+python3 /opt/State_machine_instrument.py . -b /blocked_variables.txt
 
 # build project
 perl scripts/config.pl set MBEDTLS_PLATFORM_TIME_ALT
