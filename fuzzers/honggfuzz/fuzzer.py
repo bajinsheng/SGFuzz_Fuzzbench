@@ -50,6 +50,8 @@ def fuzz(input_corpus, output_corpus, target_binary):
         '--persistent',
         '--rlimit_rss',
         '2048',
+        '--threads',
+        '1',
         '--sanitizers_del_report=true',
         '--input',
         input_corpus,

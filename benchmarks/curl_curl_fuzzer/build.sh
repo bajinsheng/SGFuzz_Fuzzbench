@@ -1,0 +1,85 @@
+#!/bin/bash -eu
+# Copyright 2016 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+################################################################################
+
+# Save off the current folder as the build root.
+
+#pushd $SRC/
+#patch -p0 -i state_variable.patch
+#popd
+
+python3 $SRC/fuzzers/sfuzzer/SFuzzer/sanitizer/State_machine_instrument.py $SRC/curl -b /blocked_variables.txt
+
+export BUILD_ROOT=$PWD
+SCRIPTDIR=${BUILD_ROOT}/scripts
+
+. ${SCRIPTDIR}/fuzz_targets
+
+ZLIBDIR=/src/zlib
+OPENSSLDIR=/src/openssl
+NGHTTPDIR=/src/nghttp2
+
+echo "CC: $CC"
+echo "CXX: $CXX"
+echo "LIB_FUZZING_ENGINE: $LIB_FUZZING_ENGINE"
+echo "CFLAGS: $CFLAGS"
+echo "CXXFLAGS: $CXXFLAGS"
+echo "ARCHITECTURE: $ARCHITECTURE"
+echo "FUZZ_TARGETS: $FUZZ_TARGETS"
+
+export MAKEFLAGS+="-j$(nproc)"
+
+# Make an install directory
+export INSTALLDIR=/src/curl_install
+
+# Install zlib
+CC=clang CXX=clang++ ${SCRIPTDIR}/handle_x.sh zlib ${ZLIBDIR} ${INSTALLDIR} || exit 1
+
+# For the memory sanitizer build, turn off OpenSSL as it causes bugs we can't
+# affect (see 16697, 17624)
+if [[ ${SANITIZER} != "memory" ]]
+then
+    # Install openssl
+    export OPENSSLFLAGS="-fno-sanitize=alignment"
+    ${SCRIPTDIR}/handle_x.sh openssl ${OPENSSLDIR} ${INSTALLDIR} || exit 1
+fi
+
+# Install nghttp2
+CC=clang CXX=clang++ ${SCRIPTDIR}/handle_x.sh nghttp2 ${NGHTTPDIR} ${INSTALLDIR} || exit 1
+
+# Compile curl
+${SCRIPTDIR}/install_curl.sh /src/curl ${INSTALLDIR} || true
+
+# Manually copy the necessary file to the target folder
+cp -r /src/curl/include/curl  ${INSTALLDIR}/include/
+cp /src/curl/lib/.libs/libcurl.* ${INSTALLDIR}/lib/
+
+# Build the fuzzers.
+${SCRIPTDIR}/compile_fuzzer.sh ${INSTALLDIR}
+make zip
+
+# Copy the fuzzers over.
+for TARGET in $FUZZ_TARGETS
+do
+  cp -v ${TARGET} ${TARGET}_seed_corpus.zip $OUT/
+done
+
+# Use the local seed
+rm -rf $OUT/*_seed_corpus.zip
+cp -r /opt/seeds $OUT/
+
+# Copy dictionary and options file to $OUT.
+cp -v ossconfig/*.dict ossconfig/*.options $OUT/

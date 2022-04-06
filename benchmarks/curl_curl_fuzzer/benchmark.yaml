@@ -1,0 +1,5 @@
+commit: aab3a77e8c1be2e5333d1ae436ab99d8b8f73580
+commit_date: 2021-03-15 23:35:38+00:00
+fuzz_target: curl_fuzzer
+project: curl
+type: bug

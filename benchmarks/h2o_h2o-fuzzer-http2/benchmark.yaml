@@ -1,0 +1,5 @@
+commit: 1e7344932fcab8767e5c1297d08d3b06db4fc5a6
+commit_date: 2021-03-14 07:07:45+00:00
+fuzz_target: h2o-fuzzer-http2
+project: h2o
+type: bug

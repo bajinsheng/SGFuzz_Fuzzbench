@@ -1,0 +1,5 @@
+commit: e483a77c85e1f9c1dd2eb1c5a8f552d2617fe400
+commit_date: 2021-03-12 16:55:26+00:00
+fuzz_target: fuzz_dtlsserver
+project: mbedtls
+type: bug
