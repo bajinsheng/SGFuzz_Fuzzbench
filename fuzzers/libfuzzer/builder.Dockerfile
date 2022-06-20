@@ -15,10 +15,11 @@
 ARG parent_image
 FROM $parent_image
 
-RUN git clone https://github.com/bajinsheng/libfuzzer && \
-    cd libfuzzer && \
+RUN git clone https://github.com/llvm/llvm-project.git /llvm-project && \
+    cd /llvm-project/ && \
+    git checkout 5cda4dc7b4d28fcd11307d4234c513ff779a1c6f && \
+    cd compiler-rt/lib/fuzzer && \
     (for f in *.cpp; do \
-      clang++ -g -stdlib=libc++ -std=c++11 -fPIC -O2 $f -c & \
+      clang++ -stdlib=libc++ -fPIC -O2 -std=c++11 $f -c & \
     done && wait) && \
-    ar r /usr/lib/libFuzzer.a *.o && \
-    curl https://raw.githubusercontent.com/bajinsheng/SGFuzz/master/sanitizer/State_machine_instrument.py -o /opt/State_machine_instrument.py
+    ar r /usr/lib/libFuzzer.a *.o

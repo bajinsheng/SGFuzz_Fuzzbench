@@ -20,7 +20,9 @@
 
 pushd $SRC/h2o
 
-python3 /opt/State_machine_instrument.py . -b /blocked_variables.txt
+if [ "$fuzzer" = "sfuzzer" ]; then
+    python3 /opt/State_machine_instrument.py . -b /blocked_variables.txt
+fi
 
 cmake -DBUILD_FUZZER=ON -DOSS_FUZZ=ON -DCMAKE_BUILD_TYPE=Debug -DOPENSSL_USE_STATIC_LIBS=TRUE .
 make h2o-fuzzer-http2

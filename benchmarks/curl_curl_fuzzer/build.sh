@@ -21,8 +21,9 @@
 #patch -p0 -i state_variable.patch
 #popd
 
-python3 /opt/State_machine_instrument.py $SRC/curl -b /blocked_variables.txt
-
+if [ "$fuzzer" = "sfuzzer" ]; then
+    python3 /opt/State_machine_instrument.py $SRC/curl -b /blocked_variables.txt
+fi
 echo "" > $SRC/curl/lib/checksrc.pl
 ./ossfuzz.sh
 
